@@ -920,15 +920,28 @@
     if (activeIdx === currentLineIndex) return;
     currentLineIndex = activeIdx;
 
-    // Update line classes
+    // Update line classes — only change lines whose state actually changed
+    // to avoid the one-frame flicker caused by remove-all → re-add
     const lines = lyricsContainer.querySelectorAll('.lumina-line, .lumina-spacer');
     lines.forEach(el => {
       const idx = parseInt(el.dataset.index);
-      el.classList.remove('active', 'past', 'near-active');
-      if (idx === activeIdx) el.classList.add('active');
-      else if (idx === activeIdx - 1 || idx === activeIdx + 1) el.classList.add('near-active');
-      else if (idx < activeIdx) el.classList.add('past');
+      const desired =
+        idx === activeIdx         ? 'active'      :
+        idx === activeIdx - 1 ||
+        idx === activeIdx + 1     ? 'near-active'  :
+        idx < activeIdx           ? 'past'          : '';
+
+      const current =
+        el.classList.contains('active')      ? 'active'      :
+        el.classList.contains('near-active') ? 'near-active'  :
+        el.classList.contains('past')        ? 'past'          : '';
+
+      if (current !== desired) {
+        el.classList.remove('active', 'past', 'near-active');
+        if (desired) el.classList.add(desired);
+      }
     });
+
 
     // Auto-scroll to active line
     if (!userScrolling) {
