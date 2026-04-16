@@ -1,19 +1,19 @@
 // ==UserScript==
 // @name         Lumina Lyrics
-// @description  Cinematic, karaoke-style lyrics overlay for Spotify — inspired by Beautiful Lyrics
+// @description  Cinematic, karaoke-style lyrics overlay for Spotify â€” inspired by Beautiful Lyrics
 // @version      1.0.0
 // @author       lumina-lyrics
 // ==/UserScript==
 
 (async function LuminaLyrics() {
-  // ─── Wait for Spicetify to be ready ───────────────────────────────────────
+  // â”€â”€â”€ Wait for Spicetify to be ready â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   while (!Spicetify?.showNotification) {
     await new Promise(r => setTimeout(r, 100));
   }
 
   const { Player, CosmosAsync, Platform, URI } = Spicetify;
 
-  // ─── State ─────────────────────────────────────────────────────────────────
+  // â”€â”€â”€ State â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   let lyrics = [];
   let currentLineIndex = -1;
   let animationFrame = null;
@@ -27,10 +27,10 @@
   let isKaraokeMode = false;
   let backgroundColors = ['#0d0d1a', '#0d0d1a'];
 
-  // ─── Musixmatch token cache ─────────────────────────────────────────────────
+  // â”€â”€â”€ Musixmatch token cache â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   let mxmToken = null;
 
-  // ─── Inject CSS ────────────────────────────────────────────────────────────
+  // â”€â”€â”€ Inject CSS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   const style = document.createElement('style');
   style.id = 'lumina-lyrics-style';
   style.textContent = `
@@ -56,7 +56,7 @@
       pointer-events: all;
     }
 
-    /* ── Animated background ── */
+    /* â”€â”€ Animated background â”€â”€ */
     #lumina-bg {
       position: absolute;
       inset: 0;
@@ -97,7 +97,7 @@
       to   { transform: translate(4%, 3%) scale(1.08); }
     }
 
-    /* ── Noise grain overlay ── */
+    /* â”€â”€ Noise grain overlay â”€â”€ */
     #lumina-grain {
       position: absolute;
       inset: 0;
@@ -107,7 +107,15 @@
       background-size: 256px 256px;
     }
 
-    /* ── Sidebar (left pane) ── */
+    /* â”€â”€ Particle canvas â”€â”€ */
+    #lumina-particles-container {
+      position: absolute;
+      inset: 0;
+      z-index: 15;
+      pointer-events: none;
+    }
+
+    /* â”€â”€ Sidebar (left pane) â”€â”€ */
     #lumina-sidebar {
       position: relative;
       z-index: 10;
@@ -158,7 +166,7 @@
       text-overflow: ellipsis;
     }
 
-    /* ── Right pane top bar ── */
+    /* â”€â”€ Right pane top bar â”€â”€ */
     #lumina-topbar {
       position: relative;
       z-index: 10;
@@ -223,7 +231,7 @@
       color: rgba(255,255,255,0.9);
     }
 
-    /* ── Right pane ── */
+    /* â”€â”€ Right pane â”€â”€ */
     #lumina-right {
       width: 55%;
       display: flex;
@@ -232,7 +240,7 @@
       position: relative;
     }
 
-    /* ── Lyrics scroll area ── */
+    /* â”€â”€ Lyrics scroll area â”€â”€ */
     #lumina-lyrics-wrap {
       position: relative;
       z-index: 5;
@@ -262,7 +270,7 @@
     #lumina-lyrics-wrap::-webkit-scrollbar { display: none; }
     #lumina-lyrics-wrap { scrollbar-width: none; -ms-overflow-style: none; }
 
-    /* ── Individual lyric lines ── */
+    /* â”€â”€ Individual lyric lines â”€â”€ */
     .lumina-line {
       display: block;
       font-size: clamp(22px, 3.2vw, 38px);
@@ -298,7 +306,7 @@
       transform: scale(1.01);
     }
 
-    /* ── Karaoke word-by-word highlight ── */
+    /* â”€â”€ Karaoke word-by-word highlight â”€â”€ */
     .lumina-word {
       display: inline;
       transition: color 0.15s ease, text-shadow 0.15s ease;
@@ -309,7 +317,7 @@
       text-shadow: 0 0 20px rgba(255,255,255,0.6);
     }
 
-    /* ── Instrumental / loading states ── */
+    /* â”€â”€ Instrumental / loading states â”€â”€ */
     .lumina-spacer {
       display: flex;
       align-items: center;
@@ -343,7 +351,7 @@
       line-height: 1.6;
     }
 
-    /* ── Player controls ── */
+    /* â”€â”€ Player controls â”€â”€ */
     #lumina-player-controls {
       display: flex;
       align-items: center;
@@ -400,7 +408,7 @@
       height: 22px;
     }
 
-    /* ── Progress bar ── */
+    /* â”€â”€ Progress bar â”€â”€ */
     #lumina-progress {
       display: flex;
       align-items: center;
@@ -456,7 +464,7 @@
       opacity: 1;
     }
 
-    /* ── Trigger button in Spotify bar ── */
+    /* â”€â”€ Trigger button in Spotify bar â”€â”€ */
     #lumina-trigger-btn {
       display: flex;
       align-items: center;
@@ -491,7 +499,7 @@
   `;
   document.head.appendChild(style);
 
-  // ─── Build the overlay DOM ──────────────────────────────────────────────────
+  // â”€â”€â”€ Build the overlay DOM â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   function buildOverlay() {
     if (overlay) return;
 
@@ -500,13 +508,14 @@
     overlay.innerHTML = `
       <div id="lumina-bg"></div>
       <div id="lumina-grain"></div>
+      <div id="lumina-particles-container"></div>
 
       <!-- Left Sidebar -->
       <div id="lumina-sidebar">
         <img id="lumina-album-art" src="" alt="" />
         <div id="lumina-track-text">
-          <h2 id="lumina-title">—</h2>
-          <p id="lumina-artist">—</p>
+          <h2 id="lumina-title">â€”</h2>
+          <p id="lumina-artist">â€”</p>
         </div>
         <div id="lumina-player-controls">
           <button class="lumina-ctrl-btn" id="lumina-prev-btn" title="Previous">
@@ -532,8 +541,8 @@
       <div id="lumina-right">
         <div id="lumina-topbar">
           <div id="lumina-controls">
-            <button class="lumina-btn" id="lumina-karaoke-btn">✦ Karaoke</button>
-            <button class="lumina-btn" id="lumina-close">✕</button>
+            <button class="lumina-btn" id="lumina-karaoke-btn">âœ¦ Karaoke</button>
+            <button class="lumina-btn" id="lumina-close">âœ•</button>
           </div>
         </div>
         <div id="lumina-lyrics-wrap">
@@ -590,7 +599,7 @@
     });
   }
 
-  // ─── Show / Hide ───────────────────────────────────────────────────────────
+  // â”€â”€â”€ Show / Hide â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   function showLyrics() {
     buildOverlay();
     overlay.classList.add('visible');
@@ -598,6 +607,8 @@
     updateTriggerBtn(true);
     loadLyricsForCurrentTrack();
     startLoop();
+    initParticleSystem([[0.45, 0.25, 0.85], [0.2, 0.45, 0.9], [0.7, 0.3, 0.8], [1, 1, 1]]);
+    startParticles();
   }
 
   function hideLyrics() {
@@ -606,9 +617,10 @@
     isVisible = false;
     updateTriggerBtn(false);
     stopLoop();
+    stopParticles();
   }
 
-  // ─── Inject trigger button into Spotify now-playing bar ────────────────────
+  // â”€â”€â”€ Inject trigger button into Spotify now-playing bar â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   function injectTriggerButton() {
     const existing = document.getElementById('lumina-trigger-btn');
     if (existing) return;
@@ -657,7 +669,7 @@
     if (btn) btn.classList.toggle('active', active);
   }
 
-  // ─── Lyrics fetching ────────────────────────────────────────────────────────
+  // â”€â”€â”€ Lyrics fetching â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   async function loadLyricsForCurrentTrack() {
     const meta = Player.data?.item;
     if (!meta) return;
@@ -751,7 +763,7 @@
     return lines.map((line, i) => ({
       time: parseFloat(line.startTimeMs) / 1000,
       text: line.words || '',
-      isInstrumental: !line.words || line.words.trim() === '♪',
+      isInstrumental: !line.words || line.words.trim() === 'â™ª',
       endTime: lines[i + 1] ? parseFloat(lines[i + 1].startTimeMs) / 1000 : Infinity,
       syncType,
     }));
@@ -779,7 +791,7 @@
       .map((text, i) => ({ time: i * 4, text, isInstrumental: false, endTime: (i + 1) * 4, unsynced: true }));
   }
 
-  // ─── Render ─────────────────────────────────────────────────────────────────
+  // â”€â”€â”€ Render â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   function renderLoadingState() {
     lyricsContainer.innerHTML = `
       <div class="lumina-spacer">
@@ -791,7 +803,7 @@
   }
 
   function renderNoLyrics(msg) {
-    lyricsContainer.innerHTML = `<div class="lumina-no-lyrics">🎵<br/><br/>${msg}</div>`;
+    lyricsContainer.innerHTML = `<div class="lumina-no-lyrics">ðŸŽµ<br/><br/>${msg}</div>`;
   }
 
   function renderLyrics() {
@@ -845,7 +857,7 @@
     lyricsContainer.appendChild(botSpacer);
   }
 
-  // ─── Animation loop ─────────────────────────────────────────────────────────
+  // â”€â”€â”€ Animation loop â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   function startLoop() {
     if (animationFrame) cancelAnimationFrame(animationFrame);
     loop();
@@ -933,7 +945,7 @@
     }
   }
 
-  // ─── Background color extraction ────────────────────────────────────────────
+  // â”€â”€â”€ Background color extraction â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   function updateBackgroundFromArt(imgUrl) {
     const img = new Image();
     img.crossOrigin = 'anonymous';
@@ -964,10 +976,219 @@
           bg.style.setProperty('--lumina-color1', toHex(c1));
           bg.style.setProperty('--lumina-color2', toHex(c2));
         }
+
+        // Feed colors to OGL particle system (normalized 0â€“1 RGB)
+        const toNormRgb = ([r, g, b]) => [
+          Math.min(1, r / 255 * 1.3 + 0.1),
+          Math.min(1, g / 255 * 1.3 + 0.1),
+          Math.min(1, b / 255 * 1.3 + 0.1)
+        ];
+        initParticleSystem(samples.map(s => toNormRgb(s)));
+        if (isVisible) startParticles();
       } catch (e) {}
     };
     img.src = imgUrl;
   }
+
+  // â”€â”€â”€ Raw WebGL Particle system (same shaders as OGL component) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
+  const VERT_SRC = [
+    'attribute vec3 position;',
+    'attribute vec4 random;',
+    'attribute vec3 color;',
+    'uniform mat4 modelMatrix;',
+    'uniform mat4 viewMatrix;',
+    'uniform mat4 projectionMatrix;',
+    'uniform float uTime;',
+    'uniform float uSpread;',
+    'uniform float uBaseSize;',
+    'uniform float uSizeRandomness;',
+    'varying vec4 vRandom;',
+    'varying vec3 vColor;',
+    'void main() {',
+    '  vRandom = random; vColor = color;',
+    '  vec3 pos = position * uSpread; pos.z *= 10.0;',
+    '  vec4 mPos = modelMatrix * vec4(pos, 1.0);',
+    '  float t = uTime;',
+    '  mPos.x += sin(t * random.z + 6.28 * random.w) * mix(0.1, 1.5, random.x);',
+    '  mPos.y += sin(t * random.y + 6.28 * random.x) * mix(0.1, 1.5, random.w);',
+    '  mPos.z += sin(t * random.w + 6.28 * random.y) * mix(0.1, 1.5, random.z);',
+    '  vec4 mvPos = viewMatrix * mPos;',
+    '  gl_PointSize = (uBaseSize * (1.0 + uSizeRandomness * (random.x - 0.5))) / length(mvPos.xyz);',
+    '  gl_Position = projectionMatrix * mvPos;',
+    '}'
+  ].join('\n');
+
+  const FRAG_SRC = [
+    'precision highp float;',
+    'uniform float uTime;',
+    'varying vec4 vRandom; varying vec3 vColor;',
+    'void main() {',
+    '  vec2 uv = gl_PointCoord.xy;',
+    '  float d = length(uv - vec2(0.5));',
+    '  float circle = smoothstep(0.5, 0.4, d) * 0.8;',
+    '  gl_FragColor = vec4(vColor + 0.2 * sin(uv.yxx + uTime + vRandom.y * 6.28), circle);',
+    '}'
+  ].join('\n');
+
+  let _pCanvas = null, _pGl = null, _pProg = null;
+  let _pBufs = {}, _pUnis = {}, _pCount = 0;
+  let particleRaf = null, particleElapsed = 0, particleLastTime = 0;
+  let _rotX = 0, _rotY = 0, _rotZ = 0;
+
+  function _compileSh(gl, type, src) {
+    const sh = gl.createShader(type);
+    gl.shaderSource(sh, src); gl.compileShader(sh);
+    if (!gl.getShaderParameter(sh, gl.COMPILE_STATUS)) {
+      console.error('[LuminaParticles]', gl.getShaderInfoLog(sh)); gl.deleteShader(sh); return null;
+    }
+    return sh;
+  }
+
+  function _perspMat(fov, aspect, near, far) {
+    const f = 1.0 / Math.tan(fov / 2), nf = 1 / (near - far);
+    return new Float32Array([
+      f/aspect,0,0,0, 0,f,0,0, 0,0,(far+near)*nf,-1, 0,0,2*far*near*nf,0
+    ]);
+  }
+
+  function _viewMat(eyeZ) {
+    return new Float32Array([1,0,0,0, 0,1,0,0, 0,0,1,0, 0,0,-eyeZ,1]);
+  }
+
+  function _mul4(a, b) {
+    const o = new Float32Array(16);
+    for (let c=0;c<4;c++) for (let r=0;r<4;r++) { let s=0; for (let k=0;k<4;k++) s+=a[k*4+r]*b[c*4+k]; o[c*4+r]=s; }
+    return o;
+  }
+
+  function _rotMat(rx, ry, rz) {
+    const cx=Math.cos(rx),sx=Math.sin(rx),cy=Math.cos(ry),sy=Math.sin(ry),cz=Math.cos(rz),sz=Math.sin(rz);
+    const Rx=new Float32Array([1,0,0,0, 0,cx,sx,0, 0,-sx,cx,0, 0,0,0,1]);
+    const Ry=new Float32Array([cy,0,-sy,0, 0,1,0,0, sy,0,cy,0, 0,0,0,1]);
+    const Rz=new Float32Array([cz,sz,0,0, -sz,cz,0,0, 0,0,1,0, 0,0,0,1]);
+    return _mul4(_mul4(Ry,Rx),Rz);
+  }
+
+  function initParticleSystem(rgbColors) {
+    if (!overlay) return;
+    _destroyOGL();
+    const container = overlay.querySelector('#lumina-particles-container');
+    if (!container) return;
+
+    _pCanvas = document.createElement('canvas');
+    _pCanvas.style.cssText = 'position:absolute;inset:0;width:100%;height:100%;pointer-events:none;';
+    container.appendChild(_pCanvas);
+
+    _pGl = _pCanvas.getContext('webgl', { alpha:true, depth:false, premultipliedAlpha:false, antialias:false });
+    if (!_pGl) { console.warn('[LuminaLyrics] WebGL not available'); return; }
+    const gl = _pGl;
+
+    gl.clearColor(0,0,0,0);
+    gl.enable(gl.BLEND);
+    gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+
+    const vs = _compileSh(gl, gl.VERTEX_SHADER, VERT_SRC);
+    const fs = _compileSh(gl, gl.FRAGMENT_SHADER, FRAG_SRC);
+    if (!vs || !fs) return;
+    _pProg = gl.createProgram();
+    gl.attachShader(_pProg, vs); gl.attachShader(_pProg, fs);
+    gl.linkProgram(_pProg);
+    if (!gl.getProgramParameter(_pProg, gl.LINK_STATUS)) {
+      console.error('[LuminaParticles] Link error:', gl.getProgramInfoLog(_pProg)); return;
+    }
+
+    const count = 200; _pCount = count;
+    const palette = rgbColors && rgbColors.length ? rgbColors : [[0.8,0.6,1]];
+    const pos = new Float32Array(count*3), rnd = new Float32Array(count*4), col = new Float32Array(count*3);
+    for (let i=0;i<count;i++) {
+      let x,y,z,len;
+      do { x=Math.random()*2-1; y=Math.random()*2-1; z=Math.random()*2-1; len=x*x+y*y+z*z; } while(len>1||len===0);
+      const r=Math.cbrt(Math.random());
+      pos.set([x*r,y*r,z*r],i*3);
+      rnd.set([Math.random(),Math.random(),Math.random(),Math.random()],i*4);
+      col.set(palette[Math.floor(Math.random()*palette.length)],i*3);
+    }
+
+    function mkBuf(data, size) {
+      const b=gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER,b);
+      gl.bufferData(gl.ARRAY_BUFFER,data,gl.STATIC_DRAW); return {b,size};
+    }
+    _pBufs = { position:mkBuf(pos,3), random:mkBuf(rnd,4), color:mkBuf(col,3) };
+
+    gl.useProgram(_pProg);
+    _pUnis = {
+      model: gl.getUniformLocation(_pProg,'modelMatrix'),
+      view:  gl.getUniformLocation(_pProg,'viewMatrix'),
+      proj:  gl.getUniformLocation(_pProg,'projectionMatrix'),
+      uTime: gl.getUniformLocation(_pProg,'uTime'),
+      uSpread:   gl.getUniformLocation(_pProg,'uSpread'),
+      uBaseSize: gl.getUniformLocation(_pProg,'uBaseSize'),
+      uSizeRand: gl.getUniformLocation(_pProg,'uSizeRandomness'),
+    };
+    gl.uniform1f(_pUnis.uSpread, 10);
+    gl.uniform1f(_pUnis.uBaseSize, 100);
+    gl.uniform1f(_pUnis.uSizeRand, 1);
+
+    _rotX=0; _rotY=0; _rotZ=0;
+
+    const _resize = () => {
+      const w = container.offsetWidth || window.innerWidth;
+      const h = container.offsetHeight || window.innerHeight;
+      _pCanvas.width=w; _pCanvas.height=h;
+      gl.viewport(0,0,w,h);
+      gl.useProgram(_pProg);
+      gl.uniformMatrix4fv(_pUnis.proj, false, _perspMat(15*Math.PI/180, w/h, 0.1, 100));
+      gl.uniformMatrix4fv(_pUnis.view, false, _viewMat(20));
+    };
+    _resize();
+    window._luminaParticleResize = _resize;
+    window.addEventListener('resize', _resize);
+  }
+
+  function startParticles() {
+    if (particleRaf) cancelAnimationFrame(particleRaf);
+    particleElapsed=0; particleLastTime=performance.now();
+    _animateOGL();
+  }
+
+  function stopParticles() {
+    if (particleRaf) cancelAnimationFrame(particleRaf);
+    particleRaf=null;
+  }
+
+  function _animateOGL() {
+    if (!isVisible) return;
+    particleRaf = requestAnimationFrame(_animateOGL);
+    if (!_pGl || !_pProg) return;
+    const gl=_pGl;
+    const now=performance.now(), delta=now-particleLastTime;
+    particleLastTime=now; particleElapsed+=delta*0.1;
+    _rotX=Math.sin(particleElapsed*0.00002)*0.1;
+    _rotY=Math.cos(particleElapsed*0.00005)*0.15;
+    _rotZ+=0.001;
+    gl.clear(gl.COLOR_BUFFER_BIT);
+    gl.useProgram(_pProg);
+    gl.uniformMatrix4fv(_pUnis.model, false, _rotMat(_rotX,_rotY,_rotZ));
+    gl.uniform1f(_pUnis.uTime, particleElapsed*0.001);
+    for (const [name,{b,size}] of Object.entries(_pBufs)) {
+      const loc=gl.getAttribLocation(_pProg,name); if(loc<0) continue;
+      gl.bindBuffer(gl.ARRAY_BUFFER,b);
+      gl.enableVertexAttribArray(loc);
+      gl.vertexAttribPointer(loc,size,gl.FLOAT,false,0,0);
+    }
+    gl.drawArrays(gl.POINTS,0,_pCount);
+  }
+
+  function _destroyOGL() {
+    stopParticles();
+    if (_pCanvas && _pCanvas.parentNode) _pCanvas.parentNode.removeChild(_pCanvas);
+    _pCanvas=null; _pGl=null; _pProg=null; _pBufs={};
+    if (window._luminaParticleResize) {
+      window.removeEventListener('resize', window._luminaParticleResize);
+      window._luminaParticleResize=null;
+    }
+  }
+
 
   // ─── Helpers ────────────────────────────────────────────────────────────────
   function formatTime(ms) {
