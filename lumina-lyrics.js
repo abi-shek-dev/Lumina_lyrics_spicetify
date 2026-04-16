@@ -41,8 +41,7 @@
       inset: 0;
       z-index: 9999;
       display: flex;
-      flex-direction: column;
-      align-items: center;
+      flex-direction: row;
       font-family: 'Figtree', -apple-system, BlinkMacSystemFont, sans-serif;
       opacity: 0;
       pointer-events: none;
@@ -106,45 +105,68 @@
       background-size: 256px 256px;
     }
 
-    /* ── Top bar ── */
+    /* ── Sidebar (left pane) ── */
+    #lumina-sidebar {
+      position: relative;
+      z-index: 10;
+      width: 380px;
+      flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 60px 40px 40px;
+      box-sizing: border-box;
+      gap: 24px;
+    }
+
+    #lumina-album-art {
+      width: min(280px, 28vw);
+      height: min(280px, 28vw);
+      border-radius: 18px;
+      object-fit: cover;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.7), 0 4px 20px rgba(0,0,0,0.5);
+      transition: box-shadow 1.5s ease;
+      flex-shrink: 0;
+    }
+
+    #lumina-track-text {
+      text-align: center;
+      width: 100%;
+    }
+
+    #lumina-track-text h2 {
+      margin: 0;
+      font-size: 20px;
+      font-weight: 700;
+      color: rgba(255,255,255,0.95);
+      letter-spacing: -0.02em;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    #lumina-track-text p {
+      margin: 6px 0 0;
+      font-size: 14px;
+      font-weight: 400;
+      color: rgba(255,255,255,0.45);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* ── Right pane top bar ── */
     #lumina-topbar {
       position: relative;
       z-index: 10;
       width: 100%;
       display: flex;
       align-items: center;
-      justify-content: space-between;
+      justify-content: flex-end;
       padding: 48px 28px 0;
       box-sizing: border-box;
-    }
-
-    #lumina-track-info {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-    }
-
-    #lumina-album-art {
-      width: 48px;
-      height: 48px;
-      border-radius: 8px;
-      object-fit: cover;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.5);
-    }
-
-    #lumina-track-text h2 {
-      margin: 0;
-      font-size: 15px;
-      font-weight: 600;
-      color: rgba(255,255,255,0.95);
-      letter-spacing: -0.01em;
-    }
-
-    #lumina-track-text p {
-      margin: 2px 0 0;
-      font-size: 12px;
-      font-weight: 400;
-      color: rgba(255,255,255,0.5);
+      flex-shrink: 0;
     }
 
     #lumina-controls {
@@ -199,30 +221,38 @@
       color: rgba(255,255,255,0.9);
     }
 
+    /* ── Right pane ── */
+    #lumina-right {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      position: relative;
+    }
+
     /* ── Lyrics scroll area ── */
     #lumina-lyrics-wrap {
       position: relative;
       z-index: 5;
       flex: 1;
       width: 100%;
-      max-width: 720px;
       overflow-y: auto;
       overflow-x: hidden;
-      padding: 60px 40px 140px;
+      padding: 20px 60px 100px 20px;
       box-sizing: border-box;
       scroll-behavior: smooth;
       -webkit-mask-image: linear-gradient(
         to bottom,
         transparent 0%,
-        black 12%,
-        black 78%,
+        black 10%,
+        black 80%,
         transparent 100%
       );
       mask-image: linear-gradient(
         to bottom,
         transparent 0%,
-        black 12%,
-        black 78%,
+        black 10%,
+        black 80%,
         transparent 100%
       );
     }
@@ -313,14 +343,11 @@
 
     /* ── Player controls ── */
     #lumina-player-controls {
-      position: absolute;
-      z-index: 10;
-      bottom: 68px;
-      left: 50%;
-      transform: translateX(-50%);
       display: flex;
       align-items: center;
+      justify-content: center;
       gap: 20px;
+      width: 100%;
     }
 
     .lumina-ctrl-btn {
@@ -373,15 +400,10 @@
 
     /* ── Progress bar ── */
     #lumina-progress {
-      position: absolute;
-      z-index: 10;
-      bottom: 28px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: min(480px, 80vw);
       display: flex;
       align-items: center;
       gap: 12px;
+      width: 100%;
     }
 
     #lumina-time-current,
@@ -476,42 +498,44 @@
       <div id="lumina-bg"></div>
       <div id="lumina-grain"></div>
 
-      <div id="lumina-topbar">
-        <div id="lumina-track-info">
-          <img id="lumina-album-art" src="" alt="" />
-          <div id="lumina-track-text">
-            <h2 id="lumina-title">—</h2>
-            <p id="lumina-artist">—</p>
+      <!-- Left Sidebar -->
+      <div id="lumina-sidebar">
+        <img id="lumina-album-art" src="" alt="" />
+        <div id="lumina-track-text">
+          <h2 id="lumina-title">—</h2>
+          <p id="lumina-artist">—</p>
+        </div>
+        <div id="lumina-player-controls">
+          <button class="lumina-ctrl-btn" id="lumina-prev-btn" title="Previous">
+            <svg viewBox="0 0 24 24"><path d="M6 6h2v12H6zm3.5 6 8.5 6V6z"/></svg>
+          </button>
+          <button class="lumina-ctrl-btn" id="lumina-play-btn" title="Play / Pause">
+            <svg id="lumina-play-icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+          </button>
+          <button class="lumina-ctrl-btn" id="lumina-next-btn" title="Next">
+            <svg viewBox="0 0 24 24"><path d="M6 18l8.5-6L6 6v12zm2.5-6 5.5 3.9V8.1L8.5 12zM16 6h2v12h-2z"/></svg>
+          </button>
+        </div>
+        <div id="lumina-progress">
+          <span id="lumina-time-current">0:00</span>
+          <div id="lumina-progress-track">
+            <div id="lumina-progress-fill"></div>
+          </div>
+          <span id="lumina-time-total">0:00</span>
+        </div>
+      </div>
+
+      <!-- Right pane -->
+      <div id="lumina-right">
+        <div id="lumina-topbar">
+          <div id="lumina-controls">
+            <button class="lumina-btn" id="lumina-karaoke-btn">✦ Karaoke</button>
+            <button class="lumina-btn" id="lumina-close">✕</button>
           </div>
         </div>
-        <div id="lumina-controls">
-          <button class="lumina-btn" id="lumina-karaoke-btn">✦ Karaoke</button>
-          <button class="lumina-btn" id="lumina-close">✕</button>
+        <div id="lumina-lyrics-wrap">
+          <div id="lumina-lines"></div>
         </div>
-      </div>
-
-      <div id="lumina-lyrics-wrap">
-        <div id="lumina-lines"></div>
-      </div>
-
-      <div id="lumina-player-controls">
-        <button class="lumina-ctrl-btn" id="lumina-prev-btn" title="Previous">
-          <svg viewBox="0 0 24 24"><path d="M6 6h2v12H6zm3.5 6 8.5 6V6z"/></svg>
-        </button>
-        <button class="lumina-ctrl-btn" id="lumina-play-btn" title="Play / Pause">
-          <svg id="lumina-play-icon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-        </button>
-        <button class="lumina-ctrl-btn" id="lumina-next-btn" title="Next">
-          <svg viewBox="0 0 24 24"><path d="M6 18l8.5-6L6 6v12zm2.5-6 5.5 3.9V8.1L8.5 12zM16 6h2v12h-2z"/></svg>
-        </button>
-      </div>
-
-      <div id="lumina-progress">
-        <span id="lumina-time-current">0:00</span>
-        <div id="lumina-progress-track">
-          <div id="lumina-progress-fill"></div>
-        </div>
-        <span id="lumina-time-total">0:00</span>
       </div>
     `;
 
