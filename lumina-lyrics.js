@@ -404,8 +404,9 @@
     #lumina-progress {
       display: flex;
       align-items: center;
-      gap: 12px;
+      gap: 8px;
       width: 100%;
+      max-width: 360px;
     }
 
     #lumina-time-current,
