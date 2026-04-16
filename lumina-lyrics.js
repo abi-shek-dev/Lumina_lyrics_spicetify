@@ -42,6 +42,8 @@
       z-index: 9999;
       display: flex;
       flex-direction: row;
+      justify-content: space-between;
+      align-items: stretch;
       font-family: 'Figtree', -apple-system, BlinkMacSystemFont, sans-serif;
       opacity: 0;
       pointer-events: none;
@@ -109,13 +111,13 @@
     #lumina-sidebar {
       position: relative;
       z-index: 10;
-      width: 380px;
+      width: 45%;
       flex-shrink: 0;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
-      padding: 60px 40px 40px;
+      padding: 60px 48px 48px;
       box-sizing: border-box;
       gap: 24px;
     }
@@ -223,7 +225,7 @@
 
     /* ── Right pane ── */
     #lumina-right {
-      flex: 1;
+      width: 55%;
       display: flex;
       flex-direction: column;
       overflow: hidden;
