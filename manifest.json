@@ -1,0 +1,15 @@
+{
+  "name": "Lumina Lyrics",
+  "version": "1.0.0",
+  "description": "Cinematic, karaoke-style full-screen lyrics overlay for Spotify. Inspired by Beautiful Lyrics — with auto-scrolling synced lines, word-by-word karaoke mode, and album art-driven ambient backgrounds.",
+  "tags": ["lyrics", "karaoke", "ui", "overlay"],
+  "preview": "preview.png",
+  "homepageURL": "https://github.com/lumina-lyrics/lumina-lyrics",
+  "authors": [
+    {
+      "name": "lumina-lyrics",
+      "url": "https://github.com/lumina-lyrics"
+    }
+  ],
+  "entrypoint": "lumina-lyrics.js"
+}
