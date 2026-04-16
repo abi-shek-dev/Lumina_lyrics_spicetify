@@ -276,34 +276,46 @@
       font-size: clamp(22px, 3.2vw, 38px);
       font-weight: 700;
       line-height: 1.25;
-      color: rgba(255,255,255,0.18);
+      color: rgba(255,255,255,0.15);
+      opacity: 0.6;
       margin-bottom: 0.55em;
       cursor: pointer;
-      transition: color 0.4s ease, transform 0.4s ease, filter 0.4s ease;
+      transition:
+        color     0.55s cubic-bezier(0.4, 0, 0.2, 1),
+        opacity   0.55s cubic-bezier(0.4, 0, 0.2, 1),
+        transform 0.55s cubic-bezier(0.4, 0, 0.2, 1),
+        filter    0.55s cubic-bezier(0.4, 0, 0.2, 1);
       letter-spacing: -0.02em;
       transform-origin: left center;
-      will-change: color, transform;
+      transform: translateY(4px) scale(0.97);
+      will-change: color, transform, opacity;
       -webkit-user-select: none;
       user-select: none;
     }
 
+
     .lumina-line:hover {
-      color: rgba(255,255,255,0.45) !important;
+      color: rgba(255,255,255,0.5) !important;
+      opacity: 0.85 !important;
     }
 
     .lumina-line.past {
-      color: rgba(255,255,255,0.25);
+      color: rgba(255,255,255,0.2);
+      opacity: 0.45;
+      transform: translateY(-3px) scale(0.97);
     }
 
     .lumina-line.active {
       color: rgba(255,255,255,1) !important;
-      transform: scale(1.03) translateX(4px);
-      filter: drop-shadow(0 0 28px rgba(255,255,255,0.25));
+      opacity: 1 !important;
+      transform: translateY(0) scale(1.03) translateX(4px);
+      filter: drop-shadow(0 0 28px rgba(255,255,255,0.3));
     }
 
     .lumina-line.near-active {
-      color: rgba(255,255,255,0.5);
-      transform: scale(1.01);
+      color: rgba(255,255,255,0.55);
+      opacity: 0.8;
+      transform: translateY(2px) scale(0.99);
     }
 
     /* â”€â”€ Karaoke word-by-word highlight â”€â”€ */
