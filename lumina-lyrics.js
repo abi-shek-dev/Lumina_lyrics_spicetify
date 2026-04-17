@@ -170,9 +170,28 @@
       opacity: 1;
     }
 
+    .lumina-close-circle {
+      width: 54px;
+      height: 54px;
+      background: rgba(255,255,255,0.14);
+      border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      transition: all 0.2s ease;
+    }
+
+    .lumina-close-circle:hover {
+      background: rgba(255,255,255,0.25);
+      border-color: rgba(255,255,255,0.3);
+      transform: scale(1.08);
+    }
+
     #lumina-cover-close svg {
-      width: 48px;
-      height: 48px;
+      width: 24px;
+      height: 24px;
       fill: currentColor;
     }
 
@@ -563,7 +582,9 @@
         <div id="lumina-art-container" title="Close lyrics">
           <img id="lumina-album-art" src="" alt="" />
           <div id="lumina-cover-close">
-            <svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+            <div class="lumina-close-circle">
+              <svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+            </div>
           </div>
         </div>
         <div id="lumina-track-text">
