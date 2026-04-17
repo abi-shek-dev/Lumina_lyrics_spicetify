@@ -551,12 +551,6 @@
 
       <!-- Right pane -->
       <div id="lumina-right">
-        <div id="lumina-topbar">
-          <div id="lumina-controls">
-            <button class="lumina-btn" id="lumina-karaoke-btn">âœ¦ Karaoke</button>
-            <button class="lumina-btn" id="lumina-close">âœ•</button>
-          </div>
-        </div>
         <div id="lumina-lyrics-wrap">
           <div id="lumina-lines"></div>
         </div>
@@ -566,19 +560,10 @@
     document.body.appendChild(overlay);
     lyricsContainer = overlay.querySelector('#lumina-lines');
 
-    // Close button
-    overlay.querySelector('#lumina-close').addEventListener('click', hideLyrics);
-
     // Player controls
     overlay.querySelector('#lumina-prev-btn').addEventListener('click', () => Player.back());
     overlay.querySelector('#lumina-next-btn').addEventListener('click', () => Player.next());
     overlay.querySelector('#lumina-play-btn').addEventListener('click', () => Player.togglePlay());
-
-    // Karaoke toggle
-    overlay.querySelector('#lumina-karaoke-btn').addEventListener('click', () => {
-      isKaraokeMode = !isKaraokeMode;
-      overlay.querySelector('#lumina-karaoke-btn').classList.toggle('active', isKaraokeMode);
-    });
 
     // Progress bar click to seek
     overlay.querySelector('#lumina-progress-track').addEventListener('click', (e) => {
