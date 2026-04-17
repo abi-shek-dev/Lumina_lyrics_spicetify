@@ -57,6 +57,8 @@
     }
 
     /* â”€â”€ Animated background â”€â”€ */
+    /* ── Animated background ── */
+
     #lumina-bg {
       position: absolute;
       inset: 0;
@@ -609,8 +611,8 @@
           </div>
         </div>
         <div id="lumina-track-text">
-          <h2 id="lumina-title">â€”</h2>
-          <p id="lumina-artist">â€”</p>
+          <h2 id="lumina-title">—</h2>
+          <p id="lumina-artist">—</p>
         </div>
         <div id="lumina-player-controls">
           <button class="lumina-ctrl-btn" id="lumina-prev-btn" title="Previous">
@@ -636,6 +638,7 @@
             <div id="lumina-volume-fill"></div>
           </div>
         </div>
+        </div>
       </div>
 
       <!-- Right pane -->
@@ -643,6 +646,7 @@
         <div id="lumina-lyrics-wrap">
           <div id="lumina-lines"></div>
         </div>
+      </div>
       </div>
     `;
 
@@ -724,6 +728,7 @@
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape' && isVisible) hideLyrics();
     });
+
   }
 
   // â”€â”€â”€ Show / Hide â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
@@ -780,6 +785,7 @@
     `;
     btn.addEventListener('click', () => {
       isVisible ? hideLyrics() : showLyrics();
+      if (overlay) overlay.classList.remove('lumina-mini');
     });
 
     // Try to insert near the right-side controls
