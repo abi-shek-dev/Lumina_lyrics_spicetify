@@ -1,0 +1,87 @@
+/* Lumina Theme for Spicetify */
+/* Matches the aesthetic of Lumina Lyrics without particles */
+
+:root {
+  --spice-button-active: #1ed760;
+  --lumina-base: #1b0a2b;
+  --lumina-accent: #451b6b;
+}
+
+/* Background grain */
+.Root__top-container::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 9999;
+    opacity: 0.04;
+    pointer-events: none;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='1'/%3E%3C/svg%3E");
+    background-size: 256px 256px;
+}
+
+/* Base Gradient Background to match Lyrics Page */
+.Root__main-view, 
+.Root__nav-bar, 
+.Root__now-playing-bar {
+  background: radial-gradient(
+    circle at top right,
+    rgba(69, 27, 107, 0.45) 0%,
+    rgba(27, 10, 43, 1) 100%
+  ) !important;
+  background-color: var(--lumina-base) !important;
+}
+
+/* Hide default backgrounds that block the gradient */
+.main-home-homeHeader,
+.main-entityHeader-background,
+.main-actionBarBackground-background {
+  background: transparent !important;
+}
+
+.main-view-container__scroll-node-child {
+  padding-bottom: 24px;
+}
+
+/* Rounded Cards with Glassmorphism */
+.main-card-card {
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.04) !important;
+  /* backdrop-filter: blur(10px); */
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  transition: transform 0.2s ease, background 0.2s ease, border-color 0.2s ease;
+}
+
+.main-card-card:hover {
+  background: rgba(255, 255, 255, 0.08) !important;
+  border-color: rgba(255, 255, 255, 0.15);
+  transform: translateY(-4px);
+}
+
+/* Floating Player Controls */
+.main-nowPlayingBar-container {
+  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  background: rgba(27, 10, 43, 0.8) !important;
+  backdrop-filter: blur(20px);
+}
+
+.main-playPauseButton-button {
+  background: rgba(255, 255, 255, 0.14) !important;
+  color: white !important;
+  transition: all 0.2s ease;
+}
+
+.main-playPauseButton-button:hover {
+  transform: scale(1.08);
+  background: rgba(255, 255, 255, 0.25) !important;
+}
+
+/* Track list hover states */
+.main-trackList-trackListRow:hover {
+  background-color: rgba(255,255,255,0.05) !important;
+  border-radius: 8px;
+}
+
+.main-trackList-trackListRow.main-trackList-selected {
+  background-color: rgba(255,255,255,0.1) !important;
+  border-radius: 8px;
+}
