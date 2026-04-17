@@ -130,14 +130,50 @@
       gap: 24px;
     }
 
-    #lumina-album-art {
+    #lumina-art-container {
+      position: relative;
       width: min(280px, 28vw);
       height: min(280px, 28vw);
       border-radius: 18px;
-      object-fit: cover;
       box-shadow: 0 20px 60px rgba(0,0,0,0.7), 0 4px 20px rgba(0,0,0,0.5);
       transition: box-shadow 1.5s ease;
       flex-shrink: 0;
+      overflow: hidden;
+      cursor: pointer;
+    }
+
+    #lumina-album-art {
+      width: 100%;
+      height: 100%;
+      display: block;
+      object-fit: cover;
+    }
+
+    #lumina-cover-close {
+      position: absolute;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.4);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      color: white;
+      border: none;
+      padding: 0;
+      cursor: pointer;
+    }
+
+    #lumina-art-container:hover #lumina-cover-close {
+      opacity: 1;
+    }
+
+    #lumina-cover-close svg {
+      width: 48px;
+      height: 48px;
+      fill: currentColor;
     }
 
     #lumina-track-text {
@@ -524,7 +560,12 @@
 
       <!-- Left Sidebar -->
       <div id="lumina-sidebar">
-        <img id="lumina-album-art" src="" alt="" />
+        <div id="lumina-art-container" title="Close lyrics">
+          <img id="lumina-album-art" src="" alt="" />
+          <div id="lumina-cover-close">
+            <svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+          </div>
+        </div>
         <div id="lumina-track-text">
           <h2 id="lumina-title">â€”</h2>
           <p id="lumina-artist">â€”</p>
@@ -559,6 +600,9 @@
 
     document.body.appendChild(overlay);
     lyricsContainer = overlay.querySelector('#lumina-lines');
+
+    // Close on album art click
+    overlay.querySelector('#lumina-art-container').addEventListener('click', hideLyrics);
 
     // Player controls
     overlay.querySelector('#lumina-prev-btn').addEventListener('click', () => Player.back());
