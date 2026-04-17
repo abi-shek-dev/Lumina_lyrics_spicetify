@@ -475,13 +475,30 @@
       height: 22px;
     }
 
-    /* â”€â”€ Progress bar â”€â”€ */
-    #lumina-progress {
+    /* ── Progress and Volume bars ── */
+    #lumina-progress,
+    #lumina-volume {
       display: flex;
       align-items: center;
       gap: 8px;
       width: 100%;
       max-width: 360px;
+    }
+
+    #lumina-volume {
+      max-width: 300px;
+    }
+
+    #lumina-vol-icon {
+      width: 18px;
+      height: 18px;
+      fill: rgba(255,255,255,0.4);
+      cursor: pointer;
+      transition: fill 0.2s;
+    }
+
+    #lumina-vol-icon:hover {
+      fill: rgba(255,255,255,0.7);
     }
 
     #lumina-time-current,
@@ -494,7 +511,8 @@
 
     #lumina-time-total { text-align: right; }
 
-    #lumina-progress-track {
+    #lumina-progress-track,
+    #lumina-volume-track {
       flex: 1;
       height: 3px;
       background: rgba(255,255,255,0.12);
@@ -504,7 +522,8 @@
       overflow: visible;
     }
 
-    #lumina-progress-fill {
+    #lumina-progress-fill,
+    #lumina-volume-fill {
       height: 100%;
       background: rgba(255,255,255,0.7);
       border-radius: 3px;
@@ -513,7 +532,8 @@
       position: relative;
     }
 
-    #lumina-progress-fill::after {
+    #lumina-progress-fill::after,
+    #lumina-volume-fill::after {
       content: '';
       position: absolute;
       right: -5px;
@@ -527,7 +547,8 @@
       transition: opacity 0.2s;
     }
 
-    #lumina-progress-track:hover #lumina-progress-fill::after {
+    #lumina-progress-track:hover #lumina-progress-fill::after,
+    #lumina-volume-track:hover #lumina-volume-fill::after {
       opacity: 1;
     }
 
@@ -609,6 +630,12 @@
           </div>
           <span id="lumina-time-total">0:00</span>
         </div>
+        <div id="lumina-volume">
+          <svg id="lumina-vol-icon" viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>
+          <div id="lumina-volume-track">
+            <div id="lumina-volume-fill"></div>
+          </div>
+        </div>
       </div>
 
       <!-- Right pane -->
@@ -636,6 +663,44 @@
       const ratio = (e.clientX - rect.left) / rect.width;
       const duration = Player.getDuration();
       if (duration) Player.seek(Math.floor(ratio * duration));
+    });
+
+    // Volume bar logic
+    const volTrack = overlay.querySelector('#lumina-volume-track');
+    let isDraggingVol = false;
+    const updateVol = (e) => {
+      const rect = volTrack.getBoundingClientRect();
+      let ratio = (e.clientX - rect.left) / rect.width;
+      ratio = Math.max(0, Math.min(1, ratio));
+      if (typeof Player.setVolume === 'function') Player.setVolume(ratio);
+      else if (Player.origin && typeof Player.origin.setVolume === 'function') Player.origin.setVolume(ratio);
+    };
+
+    volTrack.addEventListener('mousedown', (e) => {
+      isDraggingVol = true;
+      updateVol(e);
+    });
+
+    document.addEventListener('mousemove', (e) => {
+      if (isDraggingVol && isVisible) updateVol(e);
+    });
+
+    document.addEventListener('mouseup', () => {
+      isDraggingVol = false;
+    });
+
+    // Mute toggle
+    overlay.querySelector('#lumina-vol-icon').addEventListener('click', () => {
+      const volFn = Player.getVolume || Player.origin?.getVolume;
+      const setFn = Player.setVolume || Player.origin?.setVolume;
+      if (!volFn || !setFn) return;
+      const currentVol = volFn.call(Player.getVolume ? Player : Player.origin);
+      if (currentVol > 0) {
+        window._luminaLastVol = currentVol;
+        setFn.call(Player.setVolume ? Player : Player.origin, 0);
+      } else {
+        setFn.call(Player.setVolume ? Player : Player.origin, window._luminaLastVol || 1);
+      }
     });
 
     // Detect user scrolling
@@ -953,6 +1018,25 @@
       const pct = Math.min((posMs / duration) * 100, 100);
       const fill = overlay.querySelector('#lumina-progress-fill');
       if (fill) fill.style.width = pct + '%';
+    }
+
+    // Update volume bar
+    const volFn = Player.getVolume || Player.origin?.getVolume;
+    if (volFn) {
+      const vol = volFn.call(Player.getVolume ? Player : Player.origin);
+      const vFill = overlay.querySelector('#lumina-volume-fill');
+      if (vFill) vFill.style.width = (vol * 100) + '%';
+
+      const vIcon = overlay.querySelector('#lumina-vol-icon');
+      if (vIcon) {
+        if (vol === 0) {
+          vIcon.innerHTML = '<path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z"/>';
+        } else if (vol < 0.5) {
+          vIcon.innerHTML = '<path d="M18.5 12c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM5 9v6h4l5 5V4L9 9H5z"/>';
+        } else {
+          vIcon.innerHTML = '<path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/>';
+        }
+      }
     }
 
     // Update time labels
